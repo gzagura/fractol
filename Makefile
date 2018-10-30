@@ -12,18 +12,25 @@
 
 CFLAGS		= -Wall -Werror -Wextra
 NAME		= fractol
-SCR 		= src/main.c src/mandel.c src/le_hook.c src/carpet.c
+SRC_NAME 	= main.c mandel.c le_hook.c zoom.c multi_thread.c
+LIBFT_DIR	= ./libft/
+LIBFT		= ./libft/libft.a
+SRC			=$(addprefix ./src/, $(SRC_NAME))
 OBJ			= $(SRC:%.c=%.o)
 
 .PHONY: norm all re clean fclean
 
 all: $(NAME)
 
-$(NAME): $(OBJ) ./libft/libft.a
-	gcc $(CFLAGS)  $(SCR) -I /usr/local/include -I -r ././libft/libft.a -L /usr/local/lib -lmlx -framework OpenGL -framework AppKit -o $(NAME)
+$(NAME): $(OBJ) $(LIBFT)
+	gcc $(CFLAGS) $(OBJ) -I /usr/local/include -I -r $(LIBFT) -L /usr/local/lib -lmlx -framework OpenGL -framework AppKit -o $(NAME)
 
-./libft/libft.a:
-	@$(MAKE) -C ./libft
+%.o:%.c $(LIBFT) ./include/fractol.h
+	echo chlen
+	gcc $(CFLAGS) -c $< -I -o $@ 
+
+$(LIBFT):
+	@$(MAKE) -C $(LIBFT_DIR)
 
 clean:
 	rm -f $(OBJ)
@@ -32,4 +39,3 @@ fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
-

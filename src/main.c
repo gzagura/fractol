@@ -6,7 +6,7 @@
 /*   By: gzagura <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/28 13:59:07 by gzagura           #+#    #+#             */
-/*   Updated: 2018/08/28 13:59:08 by gzagura          ###   ########.fr       */
+/*   Updated: 2018/09/18 17:52:22 by gzagura          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,10 @@ int		ft_esc(t_fra *head)
 	return (0);
 }
 
-void	ft_print_usage()
+void	ft_print_usage(void)
 {
 	write(1, "usage : fractol [fractals]\nfractals:\n--> M = Mandelbrot\n", 56);
-	write(1, "--> J = Julia\n--> C = Carpet\nExample: ./fractol M\n", 50);
+	write(1, "--> J = Julia\n--> S = Ship\nExample: ./fractol M\n", 48);
 	exit(1);
 }
 
@@ -38,12 +38,12 @@ int		ft_valid(int val, char **str)
 		}
 		else if (ft_strcmp(str[1], "J") == 0)
 		{
-			ft_putstr("Juli v dele");
+			ft_putstr("Juli v dele\n");
 			return (2);
 		}
-		else if (ft_strcmp(str[1], "C") == 0)
+		else if (ft_strcmp(str[1], "S") == 0)
 		{
-			ft_putstr("KOver v dele");
+			ft_putstr("Ship v dele\n");
 			return (3);
 		}
 	}
@@ -51,48 +51,51 @@ int		ft_valid(int val, char **str)
 	return (0);
 }
 
+void	ft_init(t_fra *head, int tmp)
+{
+	if (tmp == 1)
+	{
+		head->name = 'm';
+		head->cxmin = -2.5;
+		head->cxmax = 1.5;
+		head->cymin = -2.0;
+		head->cymax = 2.0;
+	}
+	if (tmp == 2)
+	{
+		head->name = 'j';
+		head->cxmin = -2.5;
+		head->cxmax = 2.3;
+		head->cymin = -2.3;
+		head->cymax = 2.5;
+	}
+	if (tmp == 3)
+	{
+		head->name = 's';
+		head->cxmin = -2.5;
+		head->cxmax = 1.0;
+		head->cymin = -1;
+		head->cymax = 1;
+	}
+	mandel(head);
+}
+
 int		main(int argc, char **argv)
 {
 	t_fra	*head;
-	int 	tmp;
+	int		tmp;
 
 	head = malloc(sizeof(t_fra));
 	if ((tmp = ft_valid(argc, argv)) > 0)
 	{
 		head->mlx = mlx_init();
-		head->w_width = WIDTH;
-		head->w_height = HEIGHT;
 		head->wind = mlx_new_window(head->mlx, WIDTH, HEIGHT, "fractol");
 		head->img = mlx_new_image(head->mlx, WIDTH, HEIGHT);
 		head->deep = 1;
-		head->cor_x = 0;
-		head->cor_y = 0;
-		head->CxMin=-2.5;
-    	head->CxMax=1.5;
-    	head->CyMin=-2.0;
-    	head->CyMax=2.0;
-    	head->move_flag = 1;
-		head->addr = mlx_get_data_addr(head->img, &(head->bits_per_pixel), &(head->size_line), &(head->endian));
-		if (tmp == 1)
-		{
-			head->name = 'm';
-			mandel(head);
-		}
-		if (tmp == 2)
-		{
-			head->name = 'j';
-			head->CxMin=-2.5;
-	    	head->CxMax=2.3;
-	    	head->CyMin=-2.3;
-	    	head->CyMax=2.5;
-			mandel(head);
-			// ft_julia(head);
-		}
-		if (tmp == 3)
-		{
-			head->name = 'c';
-			carpet(head);
-		}
+		head->move_flag = 1;
+		head->addr = mlx_get_data_addr(head->img,
+			&(head->bits_per_pixel), &(head->size_line), &(head->endian));
+		ft_init(head, tmp);
 		mlx_hook(head->wind, 17, 1L << 17, ft_esc, head);
 		mlx_hook(head->wind, 2, 0, le_hook, head);
 		mlx_mouse_hook(head->wind, le_mouse_hook, head);
